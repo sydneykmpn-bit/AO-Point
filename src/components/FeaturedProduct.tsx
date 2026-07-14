@@ -1,6 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FadeIn } from "./FadeIn";
+import { useCart } from "@/context/CartContext";
+import { products } from "@/lib/products";
 
 const features = [
   "Holds 120+ double-sleeved cards",
@@ -9,7 +14,12 @@ const features = [
   "Lightweight PLA+ — drop-tested",
 ];
 
+const featuredProduct = products.find((p) => p.id === "forest-deck-box")!;
+
 export default function FeaturedProduct() {
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
   return (
     <section id="featured" className="py-24 lg:py-40 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
@@ -68,12 +78,15 @@ export default function FeaturedProduct() {
               </div>
 
               <div className="flex flex-wrap gap-3 pt-1">
-                <Link
-                  href="#products"
+                <button
+                  onClick={() => {
+                    addItem(featuredProduct);
+                    setAdded(true);
+                  }}
                   className="inline-flex items-center justify-center px-8 py-3.5 bg-[#004960] text-white font-bold text-[11px] tracking-[0.22em] uppercase hover:bg-[#003347] transition-colors duration-200"
                 >
-                  Add to Cart
-                </Link>
+                  {added ? "Added ✓" : "Add to Cart"}
+                </button>
                 <Link
                   href="#products"
                   className="inline-flex items-center justify-center px-8 py-3.5 border border-zinc-200 text-zinc-600 font-bold text-[11px] tracking-[0.22em] uppercase hover:border-[#004960] hover:text-[#004960] transition-colors duration-200"

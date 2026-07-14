@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { label: "Shop", href: "#products" },
@@ -12,6 +13,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { count, openCart } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -67,33 +69,83 @@ export default function Navbar() {
           >
             Shop Now
           </Link>
+          <button
+            onClick={openCart}
+            aria-label="Open cart"
+            className={`relative p-1.5 transition-colors duration-300 ${
+              scrolled ? "text-zinc-900" : "text-white"
+            }`}
+          >
+            <svg width="21" height="21" viewBox="0 0 21 21" fill="none">
+              <path
+                d="M5 6h14l-1.4 8.4a1.5 1.5 0 01-1.48 1.25H7.88a1.5 1.5 0 01-1.48-1.25L5 6zm0 0L4.3 2.5H2"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="8.5" cy="19" r="1.2" fill="currentColor" />
+              <circle cx="15.5" cy="19" r="1.2" fill="currentColor" />
+            </svg>
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#00b4d8] text-white text-[9px] font-bold flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Mobile burger */}
-        <button
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Toggle navigation menu"
-          className={`md:hidden p-2 transition-colors ${
-            scrolled ? "text-zinc-900" : "text-white"
-          }`}
-        >
-          <div className="w-5 flex flex-col gap-[5px]">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={`block h-[2px] bg-current transition-all duration-300 origin-center ${
-                  mobileOpen
-                    ? i === 0
-                      ? "rotate-45 translate-y-[7px]"
-                      : i === 1
-                      ? "opacity-0 scale-x-0"
-                      : "-rotate-45 -translate-y-[7px]"
-                    : ""
-                }`}
+        {/* Mobile cart + burger */}
+        <div className="md:hidden flex items-center gap-1">
+          <button
+            onClick={openCart}
+            aria-label="Open cart"
+            className={`relative p-2 transition-colors ${
+              scrolled ? "text-zinc-900" : "text-white"
+            }`}
+          >
+            <svg width="20" height="20" viewBox="0 0 21 21" fill="none">
+              <path
+                d="M5 6h14l-1.4 8.4a1.5 1.5 0 01-1.48 1.25H7.88a1.5 1.5 0 01-1.48-1.25L5 6zm0 0L4.3 2.5H2"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
-            ))}
-          </div>
-        </button>
+              <circle cx="8.5" cy="19" r="1.2" fill="currentColor" />
+              <circle cx="15.5" cy="19" r="1.2" fill="currentColor" />
+            </svg>
+            {count > 0 && (
+              <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-[#00b4d8] text-white text-[9px] font-bold flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle navigation menu"
+            className={`p-2 transition-colors ${
+              scrolled ? "text-zinc-900" : "text-white"
+            }`}
+          >
+            <div className="w-5 flex flex-col gap-[5px]">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className={`block h-[2px] bg-current transition-all duration-300 origin-center ${
+                    mobileOpen
+                      ? i === 0
+                        ? "rotate-45 translate-y-[7px]"
+                        : i === 1
+                        ? "opacity-0 scale-x-0"
+                        : "-rotate-45 -translate-y-[7px]"
+                      : ""
+                  }`}
+                />
+              ))}
+            </div>
+          </button>
+        </div>
       </nav>
 
       {/* Mobile drawer */}

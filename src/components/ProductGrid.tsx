@@ -6,10 +6,12 @@ import { FadeIn } from "./FadeIn";
 import { products, Product } from "@/lib/products";
 import ProductModal from "./ProductModal";
 import OrderFormModal from "./OrderFormModal";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductGrid() {
   const [selected, setSelected] = useState<Product | null>(null);
   const [ordering, setOrdering] = useState<Product | null>(null);
+  const { addItem } = useCart();
 
   return (
     <>
@@ -44,12 +46,12 @@ export default function ProductGrid() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {products.map((product, i) => (
               <FadeIn key={product.id} delay={i * 90}>
-                <button
-                  onClick={() => setSelected(product)}
-                  className="group block w-full text-left"
-                >
+                <div className="group w-full">
                   {/* Image */}
-                  <div className="relative overflow-hidden aspect-square bg-zinc-50 mb-4">
+                  <button
+                    onClick={() => setSelected(product)}
+                    className="relative block w-full overflow-hidden aspect-square bg-zinc-50 mb-4 text-left"
+                  >
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -69,10 +71,13 @@ export default function ProductGrid() {
                         View Details
                       </span>
                     </div>
-                  </div>
+                  </button>
 
                   {/* Info */}
-                  <div>
+                  <button
+                    onClick={() => setSelected(product)}
+                    className="block w-full text-left"
+                  >
                     <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-zinc-400 mb-1">
                       {product.category}
                     </p>
@@ -82,8 +87,16 @@ export default function ProductGrid() {
                     <p className="text-base font-bold text-[#004960]">
                       ₱{product.price.toLocaleString()}
                     </p>
-                  </div>
-                </button>
+                  </button>
+
+                  {/* Add to Cart */}
+                  <button
+                    onClick={() => addItem(product)}
+                    className="mt-3 w-full py-2.5 border border-zinc-200 text-zinc-700 font-bold text-[10px] tracking-[0.2em] uppercase hover:border-[#004960] hover:text-[#004960] transition-colors duration-200"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </FadeIn>
             ))}
           </div>

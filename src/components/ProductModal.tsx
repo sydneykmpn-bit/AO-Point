@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 interface Props {
   product: Product;
@@ -11,6 +12,9 @@ interface Props {
 }
 
 export default function ProductModal({ product, onClose, onBuyNow }: Props) {
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
@@ -104,10 +108,13 @@ export default function ProductModal({ product, onClose, onBuyNow }: Props) {
               Buy Now
             </button>
             <button
-              onClick={onClose}
-              className="flex-1 py-4 border border-zinc-200 text-zinc-600 font-bold text-[11px] tracking-[0.25em] uppercase hover:border-zinc-400 transition-colors duration-200"
+              onClick={() => {
+                addItem(product);
+                setAdded(true);
+              }}
+              className="flex-1 py-4 border border-[#004960] text-[#004960] font-bold text-[11px] tracking-[0.25em] uppercase hover:bg-[#004960] hover:text-white transition-colors duration-200"
             >
-              Keep Browsing
+              {added ? "Added ✓" : "Add to Cart"}
             </button>
           </div>
         </div>

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["-y", "n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://skmpn.app.n8n.cloud/",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4MmZjZGZhOC0wNTI0LTQ5N2UtYTc4OS05MmE0YzBlYzcxM2QiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMzNiOGM3NzEtOWI1Yi00NGRiLTgyYmItOTU0OTA5YzA0MjA3IiwiaWF0IjoxNzc2NTI5MTgwfQ.tz0zc43ab-dd-3LtrRiT2ADC244VvX8GNg5iUCIJjeo"
+      }
+    }
+  }
+}
