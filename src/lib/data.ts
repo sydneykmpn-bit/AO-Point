@@ -49,5 +49,5 @@ export const aboutText = "AO Point creates tools for focus, play, and performanc
 
 export const contact = {
   email: "aori.brandph@gmail.com",
-  phone: "+63 917 890 6176"
+  phone: "+63 917 123 456"
 };

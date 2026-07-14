@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -51,14 +52,21 @@ function getActionResponse(action: string): {
     case "custom":
       return {
         content:
-          "We love custom orders! 🎨 Send us a message and we'll work out the details with you.\n\n📧 aori.brandph@gmail.com\n📱 +63 917 890 6176",
+          "We love custom orders! 🎨 Send us a message and we'll work out the details with you.\n\n📧 aori.brandph@gmail.com\n📱 +63 917 123 456",
         quickReplies: [{ label: "Pricing", action: "pricing" }],
       };
     case "order":
       return {
         content:
-          "Easy! Just click any product card on the page, then hit Buy Now. Fill in the form and we'll confirm your order within 24 hours. 🛒",
-        quickReplies: [{ label: "View Products", action: "products" }],
+          "Two ways to order 🛒\n\n• Add to Cart — keep browsing and check out multiple items together\n• Buy Now — a shortcut for a quick single-item purchase\n\nEither way, fill in your details and we'll confirm within 24 hours.",
+        quickReplies: [
+          { label: "View Cart", action: "cart" },
+          { label: "View Products", action: "products" },
+        ],
+      };
+    case "cart":
+      return {
+        content: "Here's your cart! 🛒",
       };
     default:
       return {
@@ -71,17 +79,23 @@ function getActionResponse(action: string): {
 
 function basicFallback(msg: string): string {
   const t = msg.toLowerCase();
+  if (/(cart|checkout)/.test(t))
+    return "Add items with the \"Add to Cart\" button on any product, then tap the cart icon in the top nav to review and check out. 🛒";
   if (/(product|shop|buy|browse|order)/.test(t))
-    return "Click any product card on the page to view details and place an order. 🛒";
+    return "Click any product card on the page to view details, then Add to Cart or Buy Now. 🛒";
   if (/(price|cost|how much|magkano)/.test(t))
     return "Forest Deck Box ₱450, Standard Deck Box ₱380, Racket Holder ₱550, Custom Racket Holder ₱650. Free shipping over ₱1,000!";
   if (/(deliver|ship)/.test(t))
     return "Nationwide PH shipping 📦 — Luzon 3–5 days, Visayas/Mindanao 5–7 days. Free on orders over ₱1,000!";
+  if (/(payment|gcash|bank|cod|cash on delivery)/.test(t))
+    return "We accept GCash, Bank Transfer, and Cash on Delivery (COD). 💳";
   if (/(contact|email|phone)/.test(t))
-    return "📧 aori.brandph@gmail.com\n📱 +63 917 890 6176\nWe reply within 24 hours!";
+    return "📧 aori.brandph@gmail.com\n📱 +63 917 123 456\nWe reply within 24 hours!";
+  if (/(thanks|thank you|salamat)/.test(t))
+    return "You're welcome! Let us know if you need anything else. 😊";
   if (/(hello|hi|hey|kumusta)/.test(t))
-    return "Hey! 👋 I can help with products, pricing, or shipping. What would you like to know?";
-  return "Thanks for reaching out! Email us at aori.brandph@gmail.com or call +63 917 890 6176. 😊";
+    return "Hey! 👋 I can help with products, pricing, cart, or shipping. What would you like to know?";
+  return "Thanks for reaching out! Email us at aori.brandph@gmail.com or call +63 917 123 456. 😊";
 }
 
 export default function Chatbot() {
@@ -90,6 +104,7 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { openCart } = useCart();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,6 +115,9 @@ export default function Chatbot() {
 
     if (action === "products") {
       document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+    }
+    if (action === "cart") {
+      openCart();
     }
 
     const { content, quickReplies } = getActionResponse(action);
@@ -114,6 +132,11 @@ export default function Chatbot() {
   async function send() {
     const text = input.trim();
     if (!text || loading) return;
+    // Rolling window of recent turns so the AI can resolve follow-up
+    // questions ("how much is that one?") instead of answering blind.
+    const history = messages
+      .slice(-8)
+      .map(({ role, content }) => ({ role, content }));
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setInput("");
     setLoading(true);
@@ -122,7 +145,7 @@ export default function Chatbot() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, history }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
